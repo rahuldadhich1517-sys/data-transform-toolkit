@@ -1,0 +1,52 @@
+{
+  "name": "data-transform-toolkit",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Production-ready TypeScript toolkit for JSON, CSV, YAML, and XML conversion with structured data comparison",
+  "keywords": [
+    "json",
+    "csv",
+    "yaml",
+    "xml",
+    "converter",
+    "parser",
+    "serializer",
+    "diff",
+    "data-transformation",
+    "typescript"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
+    "build": "tsc",
+    "prebuild": "npm run clean",
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --strict --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build && npm pack --dry-run"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "sideEffects": false
+}
