@@ -1,7 +1,7 @@
 {
   "name": "data-transform-toolkit",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Production-ready TypeScript toolkit for JSON, CSV, YAML, and XML conversion with structured data comparison",
   "keywords": [
     "json",
