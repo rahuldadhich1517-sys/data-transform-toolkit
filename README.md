@@ -2,8 +2,11 @@
 
 Production-ready TypeScript toolkit for multi-format conversion, parsing, formatting, validation, and structured data comparison.
 
-[![CI](https://github.com/rahuldadhich1517-sys/data-transform-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/rahuldadhich1517-sys/data-transform-toolkit/actions)
+[![npm version](https://img.shields.io/npm/v/data-transform-toolkit.svg)](https://www.npmjs.com/package/data-transform-toolkit)
+[![npm downloads](https://img.shields.io/npm/dm/data-transform-toolkit.svg)](https://www.npmjs.com/package/data-transform-toolkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![CI](https://github.com/rahuldadhich1517-sys/data-transform-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/rahuldadhich1517-sys/data-transform-toolkit/actions)
 
 ## Features
 
