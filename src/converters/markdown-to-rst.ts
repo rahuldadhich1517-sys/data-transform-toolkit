@@ -2,7 +2,7 @@
  * Markdown to reStructuredText (RST) Converter
  */
 
-import { marked } from 'marked';
+import { tokenizeMarkdown } from '../internal/markdown.js';
 import { InvalidInputError } from '../errors/index.js';
 
 export interface MarkdownToRstOptions {
@@ -29,7 +29,7 @@ export function markdownToRst(
   }
 
   const headingChars = options.headingChars ?? DEFAULT_HEADING_CHARS;
-  const tokens = marked.lexer(markdown);
+  const tokens = tokenizeMarkdown(markdown);
   const out: string[] = [];
 
   for (const token of tokens) {

@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Specialized Converters**: `jsObjectToJson`, `plistToJson`, `protobufDecode`, `sqlToJson`
 - **New Typed Errors**: `TomlParseError`, `SqlParseError`, `HtmlParseError`, `ProtobufDecodeError`, `JsObjectParseError`, `IniParseError`, `EnvParseError`
 
+### Changed
+- Replaced all external runtime dependencies (`marked`, `read-excel-file`, `smol-toml`, `write-excel-file`) with custom, 100% self-contained TypeScript implementations for Markdown, TOML, and OpenXML (XLSX).
+- The package now operates with **zero external runtime dependencies**.
+
 ## [1.0.1] - 2026-09-02
 - Documentation and packaging adjustments.
 

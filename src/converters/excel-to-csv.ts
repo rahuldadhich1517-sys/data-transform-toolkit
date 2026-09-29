@@ -2,8 +2,7 @@
  * Excel (XLSX) to CSV Converter
  */
 
-import readXlsxFile from 'read-excel-file/node';
-import { serializeCsv } from '../serializers/csv-serializer.js';
+import { parseXlsx } from '../internal/xlsx.js';
 import { InvalidInputError } from '../errors/index.js';
 
 export interface ExcelToCsvOptions {
@@ -26,38 +25,32 @@ export async function excelToCsv(
     throw new InvalidInputError('Input must be a Buffer or Uint8Array');
   }
 
-  const readOptions: { sheet?: string | number } = {};
-  if (options.sheet !== undefined) {
-    readOptions.sheet = options.sheet;
-  }
-
   const buffer = Buffer.isBuffer(file) ? file : Buffer.from(file);
-  const sheets = await (readXlsxFile as (b: Buffer, opts?: unknown) => Promise<unknown>)(buffer, readOptions) as unknown as Array<{ sheet: string; data: unknown[][] }> | unknown[][];
+  let sheets: Array<{ sheet: string; data: Array<Array<unknown>> }>;
+  try {
+    sheets = parseXlsx(buffer);
+  } catch (err: unknown) {
+    throw new InvalidInputError(`Failed to parse Excel workbook: ${(err as Error).message}`);
+  }
 
   let rawRows: unknown[][] = [];
 
-  if (Array.isArray(sheets) && sheets.length > 0) {
-    const first = sheets[0];
-    if (first && typeof first === 'object' && 'data' in first && Array.isArray((first as { data: unknown[][] }).data)) {
-      // Find matching sheet if specified by name or index
-      if (typeof options.sheet === 'string') {
-        const found = (sheets as Array<{ sheet: string; data: unknown[][] }>).find(s => s.sheet === options.sheet);
-        if (!found) {
-          throw new InvalidInputError(`Sheet "${options.sheet}" not found in workbook`);
-        }
-        rawRows = found.data;
-      } else if (typeof options.sheet === 'number') {
-        const idx = options.sheet - 1;
-        const targetSheet = (sheets as Array<{ sheet: string; data: unknown[][] }>)[idx];
-        if (!targetSheet) {
-          throw new InvalidInputError(`Sheet index ${options.sheet} out of range`);
-        }
-        rawRows = targetSheet.data;
-      } else {
-        rawRows = (sheets as Array<{ sheet: string; data: unknown[][] }>)[0]!.data;
+  if (sheets.length > 0) {
+    if (typeof options.sheet === 'string') {
+      const found = sheets.find(s => s.sheet === options.sheet);
+      if (!found) {
+        throw new InvalidInputError(`Sheet "${options.sheet}" not found in workbook`);
       }
+      rawRows = found.data;
+    } else if (typeof options.sheet === 'number') {
+      const idx = options.sheet - 1;
+      const targetSheet = sheets[idx];
+      if (!targetSheet) {
+        throw new InvalidInputError(`Sheet index ${options.sheet} out of range`);
+      }
+      rawRows = targetSheet.data;
     } else {
-      rawRows = sheets as unknown[][];
+      rawRows = sheets[0]!.data;
     }
   }
 

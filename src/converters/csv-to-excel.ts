@@ -2,7 +2,7 @@
  * CSV to Excel (XLSX) Converter
  */
 
-import writeXlsxFile, { type SheetData, type Row, type Cell } from 'write-excel-file/node';
+import { buildXlsx } from '../internal/xlsx.js';
 import { parseCsv } from '../parsers/csv-parser.js';
 import type { CsvParseOptions } from '../types/csv.js';
 import { InvalidInputError } from '../errors/index.js';
@@ -34,12 +34,12 @@ export async function csvToExcel(
     headers: false // Parse as raw positional fields first
   });
 
-  const sheetData: SheetData = [];
+  const sheetRows: Array<Array<unknown>> = [];
   const hasHeader = options.hasHeader !== false;
 
   for (let rowIndex = 0; rowIndex < records.length; rowIndex++) {
     const record = records[rowIndex]!;
-    const rowCells: Cell[] = [];
+    const rowCells: unknown[] = [];
     const isHeaderRow = rowIndex === 0 && hasHeader;
 
     // Keys are column_0, column_1, ...
@@ -48,41 +48,35 @@ export async function csvToExcel(
       const val = record[key];
 
       if (val === null || val === undefined || val === '') {
-        rowCells.push({ value: undefined });
+        rowCells.push(null);
       } else if (isHeaderRow) {
-        rowCells.push({
-          value: String(val),
-          fontWeight: 'bold'
-        });
+        rowCells.push(String(val));
       } else {
         // Auto-detect number
         const trimmed = String(val).trim();
         if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
           const num = Number(trimmed);
           if (!isNaN(num)) {
-            rowCells.push({ value: num, type: Number });
+            rowCells.push(num);
             continue;
           }
         }
         if (trimmed.toLowerCase() === 'true') {
-          rowCells.push({ value: true, type: Boolean });
+          rowCells.push(true);
           continue;
         }
         if (trimmed.toLowerCase() === 'false') {
-          rowCells.push({ value: false, type: Boolean });
+          rowCells.push(false);
           continue;
         }
 
-        rowCells.push({ value: String(val), type: String });
+        rowCells.push(String(val));
       }
     }
 
-    sheetData.push(rowCells as Row);
+    sheetRows.push(rowCells);
   }
 
-  const output = writeXlsxFile(sheetData, {
-    sheet: options.sheetName ?? 'Sheet1'
-  });
-
-  return await output.toBuffer();
+  const sheetName = options.sheetName ?? 'Sheet1';
+  return buildXlsx([{ name: sheetName, rows: sheetRows }]);
 }

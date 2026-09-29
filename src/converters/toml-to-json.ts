@@ -2,7 +2,7 @@
  * TOML to JSON Converter
  */
 
-import { parse as parseToml } from 'smol-toml';
+import { parseToml } from '../internal/toml.js';
 import { TomlParseError, InvalidInputError } from '../errors/index.js';
 
 export interface TomlToJsonOptions {

@@ -2,7 +2,7 @@
  * Markdown to Plain Text Converter
  */
 
-import { marked } from 'marked';
+import { tokenizeMarkdown } from '../internal/markdown.js';
 import { InvalidInputError } from '../errors/index.js';
 
 export interface MarkdownToTextOptions {
@@ -26,7 +26,7 @@ export function markdownToText(
     return '';
   }
 
-  const tokens = marked.lexer(markdown);
+  const tokens = tokenizeMarkdown(markdown);
   const out: string[] = [];
 
   for (const token of tokens) {

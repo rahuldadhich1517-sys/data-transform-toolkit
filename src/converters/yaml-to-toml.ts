@@ -3,7 +3,7 @@
  */
 
 import { parseYaml } from '../parsers/yaml-parser.js';
-import { stringify as stringifyToml } from 'smol-toml';
+import { stringifyToml } from '../internal/toml.js';
 import { InvalidInputError } from '../errors/index.js';
 
 export interface YamlToTomlOptions {

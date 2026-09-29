@@ -2,7 +2,7 @@
  * Markdown to Slack mrkdwn Converter
  */
 
-import { marked } from 'marked';
+import { tokenizeMarkdown } from '../internal/markdown.js';
 import { InvalidInputError } from '../errors/index.js';
 
 export interface MarkdownToSlackOptions {
@@ -26,7 +26,7 @@ export function markdownToSlack(
     return '';
   }
 
-  const tokens = marked.lexer(markdown);
+  const tokens = tokenizeMarkdown(markdown);
   const out: string[] = [];
 
   for (const token of tokens) {

@@ -7,6 +7,7 @@ Production-ready TypeScript toolkit for multi-format conversion, parsing, format
 
 ## Features
 
+- **Zero runtime dependencies**: 100% self-contained pure TypeScript implementation with zero external runtime dependencies.
 - **42+ format transformations**: Convert seamlessly between JSON, CSV, Excel (XLSX), YAML, XML, TOML, HTML, Markdown, SQL, ENV, INI, TSV, NDJSON, PLIST, and Protobuf.
 - **Strictly secure**: Zero `eval()`, zero `new Function()`, zero SQL execution, safe entity decoding, prototype pollution guards, and XSS-resistant defaults.
 - **Structured data comparison**: Deep diffing with path matching, type change detection, and array order controls.
@@ -271,7 +272,7 @@ function htmlFormatter(html: string, options?: HtmlFormatterOptions): string
 ## Markdown
 
 ### `markdownToHtml`
-Renders Markdown as HTML safely using `marked`.
+Renders Markdown as safe HTML with zero external runtime dependencies.
 ```ts
 function markdownToHtml(markdown: string, options?: MarkdownToHtmlOptions): string
 ```
