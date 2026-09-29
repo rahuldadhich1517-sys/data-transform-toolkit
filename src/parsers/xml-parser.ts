@@ -240,14 +240,22 @@ export class XmlParser {
     }
 
     this.depth++;
+    let closed = false;
 
     // Parse children
     while (i < tokens.length) {
-      const token = tokens[i];
+      const token = tokens[i]!;
 
-      if (token.type === 'closing' && token.name === expectedName) {
-        i++;
-        break;
+      if (token.type === 'closing') {
+        if (token.name === expectedName) {
+          closed = true;
+          i++;
+          break;
+        } else if (this.strict) {
+          throw new XmlParseError(`Mismatched closing tag: expected </${expectedName}>, found </${token.name}>`, {
+            position: token.position
+          });
+        }
       } else if (token.type === 'text' && token.content) {
         element.children.push(token.content);
         element.text += token.content;
@@ -258,9 +266,9 @@ export class XmlParser {
         let depth = 1;
         i++;
         while (i < tokens.length && depth > 0) {
-          if ((tokens[i].type === 'opening' || tokens[i].type === 'selfClosing') && tokens[i].name === token.name) {
+          if ((tokens[i]!.type === 'opening' || tokens[i]!.type === 'selfClosing') && tokens[i]!.name === token.name) {
             depth++;
-          } else if (tokens[i].type === 'closing' && tokens[i].name === token.name) {
+          } else if (tokens[i]!.type === 'closing' && tokens[i]!.name === token.name) {
             depth--;
           }
           i++;
@@ -274,6 +282,10 @@ export class XmlParser {
       }
 
       i++;
+    }
+
+    if (!closed && this.strict) {
+      throw new XmlParseError(`Unclosed tag <${expectedName}>`);
     }
 
     this.depth--;
@@ -311,7 +323,11 @@ export class XmlParser {
 
     // Add attributes
     for (const [attrName, attrValue] of Object.entries(element.attributes)) {
-      result[this.attributePrefix + attrName] = attrValue;
+      let val: unknown = attrValue;
+      if (this.parseNumbers && typeof attrValue === 'string' && /^-?\d+(\.\d+)?$/.test(attrValue.trim())) {
+        val = Number(attrValue.trim());
+      }
+      result[this.attributePrefix + attrName] = val;
     }
 
     // If only text content, return it (with optional number parsing)

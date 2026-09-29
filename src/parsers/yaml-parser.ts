@@ -81,7 +81,7 @@ export class YamlParser {
       const content = line.trim();
 
       // Check if it's a list item
-      if (content.startsWith('- ')) {
+      if (content.startsWith('- ') || content === '-') {
         return this.parseArray(context, indent);
       }
 
@@ -202,20 +202,21 @@ export class YamlParser {
 
       const content = line.trim();
 
-      if (!content.startsWith('- ')) {
+      if (!content.startsWith('- ') && content !== '-') {
         break;
       }
 
-      const valueStr = content.substring(2).trim();
+      const valueStr = content === '-' ? '' : content.substring(2).trim();
       context.currentLine++;
 
       if (valueStr === '') {
         // Value is on the next line
         if (
           context.currentLine < context.lines.length &&
-          this.getIndentation(context.lines[context.currentLine]) > baseIndent
+          this.getIndentation(context.lines[context.currentLine]!) > baseIndent
         ) {
-          const value = this.parseValue(context, baseIndent + this.indentSize);
+          const nextIndent = this.getIndentation(context.lines[context.currentLine]!);
+          const value = this.parseValue(context, nextIndent);
           arr.push(value);
         } else {
           arr.push(null);
@@ -270,13 +271,23 @@ export class YamlParser {
   }
 
   private unquoteString(str: string): string {
-    if (str.startsWith('"') && str.endsWith('"') && str.length >= 2) {
-      return this.unescapeString(str.substring(1, str.length - 1));
+    if (str.startsWith('"')) {
+      if (str.endsWith('"') && str.length >= 2) {
+        return this.unescapeString(str.substring(1, str.length - 1));
+      }
+      if (this.strict) {
+        throw new YamlParseError('Unclosed double-quoted string');
+      }
     }
 
-    if (str.startsWith("'") && str.endsWith("'") && str.length >= 2) {
-      // Single quotes don't have escape sequences in YAML
-      return str.substring(1, str.length - 1).replace(/''/g, "'");
+    if (str.startsWith("'")) {
+      if (str.endsWith("'") && str.length >= 2) {
+        // Single quotes don't have escape sequences in YAML
+        return str.substring(1, str.length - 1).replace(/''/g, "'");
+      }
+      if (this.strict) {
+        throw new YamlParseError('Unclosed single-quoted string');
+      }
     }
 
     return str;

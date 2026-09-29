@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-09-29
+
+### Added
+- **Configuration Converters**: `envToJson`, `jsonToEnv`, `iniToJson`, `querystringToJson`, `ndjsonToJson`
+- **CSV Converters**: `csvToExcel`, `csvToHtml`, `csvToMarkdown`, `csvToSql`, `csvToTsv`, `tsvToCsv`, `csvToXml`, `csvToYaml`, `textToCsv`, `xmlToCsv`, `sqlToCsv`
+- **Excel (XLSX) Converters**: `excelToCsv`, `excelToJson`
+- **HTML Utilities**: `htmlTableToJson`, `htmlToMarkdown`, `htmlToText`, `htmlFormatter`
+- **Markdown Converters**: `markdownToHtml`, `markdownToRst`, `markdownToSlack`, `markdownToText`, `textToHtml`
+- **TOML & YAML Utilities**: `tomlToJson`, `tomlToYaml`, `yamlDiff`, `yamlFormat`, `yamlToProperties`, `yamlToToml`, `yamlValidate`
+- **XML Utilities**: `xmlFormat`, `xmlToJsonParser`, `xmlToYaml`, `xmlValidate`
+- **Specialized Converters**: `jsObjectToJson`, `plistToJson`, `protobufDecode`, `sqlToJson`
+- **New Typed Errors**: `TomlParseError`, `SqlParseError`, `HtmlParseError`, `ProtobufDecodeError`, `JsObjectParseError`, `IniParseError`, `EnvParseError`
+
+## [1.0.1] - 2026-09-02
+- Documentation and packaging adjustments.
+
 ## [1.0.0] - 2024-01-15
 
 ### Added

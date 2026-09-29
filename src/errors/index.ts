@@ -205,3 +205,174 @@ export class SecurityError extends DataTransformError {
     Object.setPrototypeOf(this, SecurityError.prototype);
   }
 }
+
+/** Error thrown during TOML parsing */
+export class TomlParseError extends DataTransformError {
+  public readonly line?: number;
+  public readonly column?: number;
+
+  constructor(
+    message: string,
+    options: {
+      line?: number;
+      column?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      line: options.line,
+      column: options.column
+    };
+    super(message, 'TOML_PARSE_ERROR', context);
+    this.name = 'TomlParseError';
+    this.line = options.line;
+    this.column = options.column;
+    Object.setPrototypeOf(this, TomlParseError.prototype);
+  }
+}
+
+/** Error thrown during SQL parsing */
+export class SqlParseError extends DataTransformError {
+  public readonly line?: number;
+  public readonly column?: number;
+
+  constructor(
+    message: string,
+    options: {
+      line?: number;
+      column?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      line: options.line,
+      column: options.column
+    };
+    super(message, 'SQL_PARSE_ERROR', context);
+    this.name = 'SqlParseError';
+    this.line = options.line;
+    this.column = options.column;
+    Object.setPrototypeOf(this, SqlParseError.prototype);
+  }
+}
+
+/** Error thrown during HTML parsing */
+export class HtmlParseError extends DataTransformError {
+  public readonly line?: number;
+  public readonly column?: number;
+
+  constructor(
+    message: string,
+    options: {
+      line?: number;
+      column?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      line: options.line,
+      column: options.column
+    };
+    super(message, 'HTML_PARSE_ERROR', context);
+    this.name = 'HtmlParseError';
+    this.line = options.line;
+    this.column = options.column;
+    Object.setPrototypeOf(this, HtmlParseError.prototype);
+  }
+}
+
+/** Error thrown during protobuf decoding */
+export class ProtobufDecodeError extends DataTransformError {
+  public readonly offset?: number;
+
+  constructor(
+    message: string,
+    options: {
+      offset?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      offset: options.offset
+    };
+    super(message, 'PROTOBUF_DECODE_ERROR', context);
+    this.name = 'ProtobufDecodeError';
+    this.offset = options.offset;
+    Object.setPrototypeOf(this, ProtobufDecodeError.prototype);
+  }
+}
+
+/** Error thrown during JS object parsing */
+export class JsObjectParseError extends DataTransformError {
+  public readonly line?: number;
+  public readonly column?: number;
+
+  constructor(
+    message: string,
+    options: {
+      line?: number;
+      column?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      line: options.line,
+      column: options.column
+    };
+    super(message, 'JSOBJECT_PARSE_ERROR', context);
+    this.name = 'JsObjectParseError';
+    this.line = options.line;
+    this.column = options.column;
+    Object.setPrototypeOf(this, JsObjectParseError.prototype);
+  }
+}
+
+/** Error thrown during INI parsing */
+export class IniParseError extends DataTransformError {
+  public readonly line?: number;
+
+  constructor(
+    message: string,
+    options: {
+      line?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      line: options.line
+    };
+    super(message, 'INI_PARSE_ERROR', context);
+    this.name = 'IniParseError';
+    this.line = options.line;
+    Object.setPrototypeOf(this, IniParseError.prototype);
+  }
+}
+
+/** Error thrown during ENV parsing */
+export class EnvParseError extends DataTransformError {
+  public readonly line?: number;
+
+  constructor(
+    message: string,
+    options: {
+      line?: number;
+      context?: Record<string, unknown>;
+    } = {}
+  ) {
+    const context = {
+      ...options.context,
+      line: options.line
+    };
+    super(message, 'ENV_PARSE_ERROR', context);
+    this.name = 'EnvParseError';
+    this.line = options.line;
+    Object.setPrototypeOf(this, EnvParseError.prototype);
+  }
+}
+
