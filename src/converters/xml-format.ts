@@ -30,7 +30,7 @@ export function xmlFormat(
   }
 
   // First validate well-formedness by parsing
-  parseXml(trimmed);
+  parseXml(trimmed, { strict: true });
 
   const indentSize = options.indent ?? 2;
   const preserveDecl = options.preserveDeclaration !== false;

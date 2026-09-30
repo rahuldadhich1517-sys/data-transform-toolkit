@@ -4,7 +4,7 @@
  */
 
 import { tokenizeHtml, type HtmlToken } from '../internal/html-parser.js';
-import { unescapeHtml } from '../internal/escaping.js';
+import { unescapeHtml, safeSetProperty } from '../internal/escaping.js';
 import { InvalidInputError } from '../errors/index.js';
 
 export interface HtmlTableToJsonOptions {
@@ -138,7 +138,7 @@ function processTableRows(
     const record: Record<string, string> = {};
     for (let c = 0; c < headers.length; c++) {
       const header = headers[c]!;
-      record[header] = row[c] ?? '';
+      safeSetProperty(record, header, row[c] ?? '');
     }
     result.push(record);
   }

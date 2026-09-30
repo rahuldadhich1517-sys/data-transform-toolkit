@@ -12,6 +12,7 @@ export class CsvSerializer {
   private readonly quoteAllFields: boolean;
   private readonly quoteEmptyFields: boolean;
   private readonly maxDepth: number;
+  private readonly headers: boolean;
 
   constructor(options: CsvSerializeOptions = {}) {
     this.delimiter = options.delimiter ?? ',';
@@ -19,6 +20,7 @@ export class CsvSerializer {
     this.quoteAllFields = options.quoteAllFields ?? false;
     this.quoteEmptyFields = options.quoteEmptyFields !== false;
     this.maxDepth = options.maxDepth ?? 100;
+    this.headers = options.headers !== false;
   }
 
   public serialize(data: unknown): string {
@@ -45,7 +47,9 @@ export class CsvSerializer {
     const rows: string[] = [];
 
     // Add header row
-    rows.push(this.escapeFields(headers).join(this.delimiter));
+    if (this.headers) {
+      rows.push(this.escapeFields(headers).join(this.delimiter));
+    }
 
     // Add data rows
     for (const row of data) {

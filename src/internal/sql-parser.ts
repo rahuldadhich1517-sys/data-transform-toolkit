@@ -256,6 +256,10 @@ export function parseSqlInsert(sql: string, options: { strict?: boolean } = {}):
     }
   }
 
+  if (rows.length === 0) {
+    throw new SqlParseError('Expected row values after "VALUES"', { line, column: col });
+  }
+
   // Derive columns if not explicitly provided
   const finalCols = [...columns];
   if (finalCols.length === 0 && rows.length > 0) {

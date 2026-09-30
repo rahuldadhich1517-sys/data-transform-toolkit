@@ -3,6 +3,7 @@
  */
 
 import { TomlParseError } from '../errors/index.js';
+import { safeSetProperty, isDangerousKey } from './escaping.js';
 
 export function parseToml(input: string): Record<string, unknown> {
   const src = input.trim();
@@ -27,6 +28,9 @@ export function parseToml(input: string): Record<string, unknown> {
     if (line.startsWith('[[') && line.endsWith(']]')) {
       const pathStr = line.substring(2, line.length - 2).trim();
       const keys = parseDottedKeys(pathStr, lineIndex + 1);
+      if (keys.some(k => isDangerousKey(k))) {
+        continue;
+      }
 
       let cur = root;
       for (let i = 0; i < keys.length - 1; i++) {
@@ -52,6 +56,9 @@ export function parseToml(input: string): Record<string, unknown> {
     if (line.startsWith('[') && line.endsWith(']')) {
       const pathStr = line.substring(1, line.length - 1).trim();
       const keys = parseDottedKeys(pathStr, lineIndex + 1);
+      if (keys.some(k => isDangerousKey(k))) {
+        continue;
+      }
 
       let cur = root;
       for (const k of keys) {
@@ -97,6 +104,9 @@ export function parseToml(input: string): Record<string, unknown> {
     }
 
     const keys = parseDottedKeys(keyStr, lineIndex + 1);
+    if (keys.some(k => isDangerousKey(k))) {
+      continue;
+    }
     const parsedVal = parseTomlValue(valStr, lineIndex + 1);
 
     let target = currentTarget;
@@ -108,7 +118,7 @@ export function parseToml(input: string): Record<string, unknown> {
       target = target[key] as Record<string, unknown>;
     }
     const finalKey = keys[keys.length - 1]!;
-    target[finalKey] = parsedVal;
+    safeSetProperty(target, finalKey, parsedVal);
   }
 
   return root;
@@ -272,13 +282,35 @@ function parseTomlArray(inner: string, line: number): unknown[] {
 
 function parseTomlInlineTable(inner: string, line: number): Record<string, unknown> {
   const result: Record<string, unknown> = {};
-  const pairs = inner.split(',');
+  const pairs: string[] = [];
+  let cur = '';
+  let inDouble = false;
+  let inSingle = false;
+  let depth = 0;
+
+  for (let i = 0; i < inner.length; i++) {
+    const c = inner[i]!;
+    if (c === '"' && !inSingle) inDouble = !inDouble;
+    else if (c === "'" && !inDouble) inSingle = !inSingle;
+    else if ((c === '[' || c === '{') && !inDouble && !inSingle) depth++;
+    else if ((c === ']' || c === '}') && !inDouble && !inSingle) depth--;
+    else if (c === ',' && !inDouble && !inSingle && depth === 0) {
+      const item = cur.trim();
+      if (item) pairs.push(item);
+      cur = '';
+      continue;
+    }
+    cur += c;
+  }
+  const last = cur.trim();
+  if (last) pairs.push(last);
+
   for (const pair of pairs) {
     const trimmed = pair.trim();
     if (!trimmed) continue;
-    const eq = trimmed.indexOf('=');
+    const eq = findEqualsIndex(trimmed);
     if (eq === -1) throw new TomlParseError(`Expected "=" in inline table: ${trimmed}`, { line });
-    const k = trimmed.substring(0, eq).trim();
+    const k = unquoteKey(trimmed.substring(0, eq).trim());
     const v = trimmed.substring(eq + 1).trim();
     result[k] = parseTomlValue(v, line);
   }
@@ -365,7 +397,7 @@ function formatTomlKey(key: string): string {
 function formatTomlValue(val: unknown): string {
   if (val === null || val === undefined) return '""';
   if (typeof val === 'string') {
-    return `"${val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
+    return `"${val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')}"`;
   }
   if (typeof val === 'number') {
     if (Number.isNaN(val)) return 'nan';

@@ -80,14 +80,27 @@ export class YamlParser {
 
       const content = line.trim();
 
+      // Check if it's inline JSON object or array
+      if (
+        (content.startsWith('{') && content.endsWith('}')) ||
+        (content.startsWith('[') && content.endsWith(']'))
+      ) {
+        try {
+          context.currentLine++;
+          return JSON.parse(content);
+        } catch {
+          // Fall through to other checks
+        }
+      }
+
       // Check if it's a list item
       if (content.startsWith('- ') || content === '-') {
         return this.parseArray(context, indent);
       }
 
       // Check if it's a key-value pair
-      const colonIndex = content.indexOf(':');
-      if (colonIndex > 0 && !this.isInQuotes(content, colonIndex)) {
+      const colonIndex = this.findUnquotedColon(content);
+      if (colonIndex > 0) {
         return this.parseObject(context, indent);
       }
 
@@ -133,8 +146,8 @@ export class YamlParser {
       const content = line.trim();
 
       // Parse key-value pair
-      const colonIndex = content.indexOf(':');
-      if (colonIndex <= 0 || this.isInQuotes(content, colonIndex)) {
+      const colonIndex = this.findUnquotedColon(content);
+      if (colonIndex <= 0) {
         break;
       }
 
@@ -332,6 +345,26 @@ export class YamlParser {
     }
 
     return inSingle || inDouble;
+  }
+
+  private findUnquotedColon(str: string): number {
+    let inSingle = false;
+    let inDouble = false;
+
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+      const prev = i > 0 ? str[i - 1] : '';
+
+      if (char === '"' && prev !== '\\') {
+        inDouble = !inDouble;
+      } else if (char === "'" && prev !== '\\') {
+        inSingle = !inSingle;
+      } else if (char === ':' && !inSingle && !inDouble) {
+        return i;
+      }
+    }
+
+    return -1;
   }
 }
 

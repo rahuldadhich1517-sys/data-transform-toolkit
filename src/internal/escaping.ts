@@ -100,3 +100,22 @@ export function escapePropertyValue(val: string): string {
     .replace(/\n/g, '\\n')
     .replace(/\t/g, '\\t');
 }
+
+/** Safely assign property to object preventing prototype pollution */
+export function safeSetProperty(target: Record<string, unknown>, key: string, value: unknown): void {
+  if (key === '__proto__') {
+    Object.defineProperty(target, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    });
+  } else {
+    target[key] = value;
+  }
+}
+
+/** Check if key could cause prototype pollution */
+export function isDangerousKey(key: string): boolean {
+  return key === '__proto__' || key === 'constructor' || key === 'prototype';
+}

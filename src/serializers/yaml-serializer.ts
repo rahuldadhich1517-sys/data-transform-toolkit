@@ -70,7 +70,6 @@ export class YamlSerializer {
 
     this.depth++;
     const lines: string[] = [];
-    const indent = ' '.repeat(this.indentSize * (this.depth - 1));
 
     for (const key of keys) {
       const value = obj[key];
@@ -80,32 +79,44 @@ export class YamlSerializer {
       }
 
       const escapedKey = this.escapeKey(key);
-      const serializedValue = this.serializeValue(value);
 
-      if (serializedValue.includes('\n')) {
-        // Multi-line value
-        lines.push(`${escapedKey}:`);
-        lines.push(this.indentLines(serializedValue, this.indentSize));
-      } else if (
+      if (
         value === null ||
         typeof value === 'string' ||
         typeof value === 'number' ||
         typeof value === 'boolean'
       ) {
+        const serializedValue = this.serializeValue(value);
         lines.push(`${escapedKey}: ${serializedValue}`);
+      } else if (Array.isArray(value)) {
+        if (value.length === 0) {
+          lines.push(`${escapedKey}: []`);
+        } else {
+          lines.push(`${escapedKey}:`);
+          const arrStr = this.serializeArray(value);
+          for (const line of arrStr.split(this.lineEnding)) {
+            lines.push(' '.repeat(this.indentSize) + line);
+          }
+        }
+      } else if (typeof value === 'object') {
+        const subKeys = Object.keys(value as JsonObject);
+        if (subKeys.length === 0) {
+          lines.push(`${escapedKey}: {}`);
+        } else {
+          lines.push(`${escapedKey}:`);
+          const objStr = this.serializeObject(value as JsonObject);
+          for (const line of objStr.split(this.lineEnding)) {
+            lines.push(' '.repeat(this.indentSize) + line);
+          }
+        }
       } else {
-        lines.push(`${escapedKey}:`);
-        lines.push(this.indentLines(serializedValue, this.indentSize));
+        const serializedValue = this.serializeValue(value as JsonValue);
+        lines.push(`${escapedKey}: ${serializedValue}`);
       }
     }
 
     this.depth--;
-
-    if (this.depth === 0) {
-      return lines.join(this.lineEnding);
-    }
-
-    return lines.map(line => ' '.repeat(this.indentSize) + line).join(this.lineEnding);
+    return lines.join(this.lineEnding);
   }
 
   private serializeArray(arr: JsonValue[]): string {
@@ -124,31 +135,43 @@ export class YamlSerializer {
     const lines: string[] = [];
 
     for (const item of arr) {
-      const serializedItem = this.serializeValue(item);
-
-      if (serializedItem.includes('\n')) {
-        lines.push('-');
-        lines.push(this.indentLines(serializedItem, this.indentSize));
-      } else if (
+      if (
         item === null ||
         typeof item === 'string' ||
         typeof item === 'number' ||
         typeof item === 'boolean'
       ) {
+        const serializedItem = this.serializeValue(item);
         lines.push(`- ${serializedItem}`);
+      } else if (Array.isArray(item)) {
+        if (item.length === 0) {
+          lines.push('- []');
+        } else {
+          lines.push('-');
+          const subArrStr = this.serializeArray(item);
+          for (const line of subArrStr.split(this.lineEnding)) {
+            lines.push(' '.repeat(this.indentSize) + line);
+          }
+        }
+      } else if (typeof item === 'object') {
+        const subKeys = Object.keys(item as JsonObject);
+        if (subKeys.length === 0) {
+          lines.push('- {}');
+        } else {
+          lines.push('-');
+          const objStr = this.serializeObject(item as JsonObject);
+          for (const line of objStr.split(this.lineEnding)) {
+            lines.push(' '.repeat(this.indentSize) + line);
+          }
+        }
       } else {
-        lines.push('-');
-        lines.push(this.indentLines(serializedItem, this.indentSize));
+        const serializedItem = this.serializeValue(item as JsonValue);
+        lines.push(`- ${serializedItem}`);
       }
     }
 
     this.depth--;
-
-    if (this.depth === 0) {
-      return lines.join(this.lineEnding);
-    }
-
-    return lines.map(line => ' '.repeat(this.indentSize) + line).join(this.lineEnding);
+    return lines.join(this.lineEnding);
   }
 
   private serializeValue(value: JsonValue): string {

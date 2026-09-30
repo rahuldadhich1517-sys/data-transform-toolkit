@@ -3,6 +3,7 @@
  */
 
 import { IniParseError } from '../errors/index.js';
+import { safeSetProperty, isDangerousKey } from '../internal/escaping.js';
 
 export interface IniToJsonOptions {
   /** How to handle duplicate keys within a section: 'last' (default), 'first', 'array', 'error' */
@@ -50,10 +51,18 @@ export function iniToJson(
       if (!sectionName) {
         throw new IniParseError(`Empty section header at line ${lineIndex + 1}`, { line: lineIndex + 1 });
       }
+      if (isDangerousKey(sectionName)) {
+        currentSection = '__ignored__';
+        continue;
+      }
       currentSection = sectionName;
       if (!result[currentSection]) {
         result[currentSection] = {};
       }
+      continue;
+    }
+
+    if (currentSection === '__ignored__') {
       continue;
     }
 
@@ -141,15 +150,23 @@ export function iniToJson(
   // Extract global properties
   if (result['__global__']) {
     for (const [k, v] of Object.entries(result['__global__'])) {
-      finalOutput[k] = v;
+      if (!isDangerousKey(k)) {
+        safeSetProperty(finalOutput, k, v);
+      }
     }
     delete result['__global__'];
   }
 
   // Nest sections if enabled
   for (const [secName, secValues] of Object.entries(result)) {
+    if (isDangerousKey(secName) || secName === '__ignored__') {
+      continue;
+    }
     if (nestedSections && secName.includes(sectionDelimiter)) {
       const parts = secName.split(sectionDelimiter);
+      if (parts.some(p => isDangerousKey(p))) {
+        continue;
+      }
       let cur = finalOutput;
       for (let i = 0; i < parts.length - 1; i++) {
         const p = parts[i]!;
@@ -159,9 +176,9 @@ export function iniToJson(
         cur = cur[p] as Record<string, unknown>;
       }
       const lastPart = parts[parts.length - 1]!;
-      cur[lastPart] = secValues;
+      safeSetProperty(cur, lastPart, secValues);
     } else {
-      finalOutput[secName] = secValues;
+      safeSetProperty(finalOutput, secName, secValues);
     }
   }
 

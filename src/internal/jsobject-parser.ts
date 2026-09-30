@@ -4,6 +4,7 @@
  */
 
 import { JsObjectParseError } from '../errors/index.js';
+import { safeSetProperty } from './escaping.js';
 
 export function parseJsObjectLiteral(input: string): unknown {
   const src = input.trim();
@@ -262,7 +263,7 @@ export function parseJsObjectLiteral(input: string): unknown {
       col++;
 
       const val = parseValue();
-      obj[key] = val;
+      safeSetProperty(obj, key, val);
 
       skipWhitespaceAndComments();
       if (src[i] === ',') {

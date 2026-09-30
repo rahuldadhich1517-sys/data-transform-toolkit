@@ -1,7 +1,7 @@
 {
   "name": "data-transform-toolkit",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Production-grade TypeScript toolkit for JSON, CSV, Excel, YAML, XML, TOML, HTML, Markdown, SQL, and ENV conversion, parsing, validation, and diffing",
   "keywords": [
     "json",
@@ -46,6 +46,7 @@
     "prebuild": "npm run clean",
     "test": "vitest run",
     "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --strict --noEmit",
     "prepublishOnly": "npm run typecheck && npm test && npm run build && npm pack --dry-run"
@@ -53,6 +54,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.9",
     "typescript": "^5.4.0",
     "vitest": "^2.1.0"
   },

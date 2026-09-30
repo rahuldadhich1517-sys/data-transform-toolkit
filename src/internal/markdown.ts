@@ -158,7 +158,28 @@ export function tokenizeMarkdown(markdown: string): MarkdownToken[] {
 
 function parseTableRow(line: string): Array<{ text: string }> {
   const inner = line.substring(1, line.length - 1);
-  return inner.split('|').map(c => ({ text: c.trim() }));
+  const cells: string[] = [];
+  let current = '';
+  let escaped = false;
+
+  for (let i = 0; i < inner.length; i++) {
+    const char = inner[i]!;
+    if (escaped) {
+      current += char;
+      escaped = false;
+    } else if (char === '\\') {
+      current += char;
+      escaped = true;
+    } else if (char === '|') {
+      cells.push(current.trim().replace(/\\\|/g, '|'));
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  cells.push(current.trim().replace(/\\\|/g, '|'));
+
+  return cells.map(c => ({ text: c }));
 }
 
 export interface RenderMarkdownOptions {

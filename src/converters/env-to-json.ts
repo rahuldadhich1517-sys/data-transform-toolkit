@@ -3,6 +3,7 @@
  */
 
 import { EnvParseError } from '../errors/index.js';
+import { safeSetProperty, isDangerousKey } from '../internal/escaping.js';
 
 export interface EnvToJsonOptions {
   /** If true, parse keys with delimiters (e.g. APP__PORT or APP.PORT) into nested objects */
@@ -150,6 +151,9 @@ function expandNestedKeys(flat: Record<string, string>, delimiter: string): Reco
 
   for (const [flatKey, value] of Object.entries(flat)) {
     const parts = flatKey.split(delimiter);
+    if (parts.some(p => isDangerousKey(p))) {
+      continue;
+    }
     let cur = root;
 
     for (let i = 0; i < parts.length - 1; i++) {
@@ -161,7 +165,7 @@ function expandNestedKeys(flat: Record<string, string>, delimiter: string): Reco
     }
 
     const lastPart = parts[parts.length - 1]!;
-    cur[lastPart] = value;
+    safeSetProperty(cur, lastPart, value);
   }
 
   return root;

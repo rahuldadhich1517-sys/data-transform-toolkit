@@ -38,5 +38,5 @@ export function sqlToCsv(
     return hasHeader ? parsed.columns.join(delimiter) : '';
   }
 
-  return serializeCsv(parsed.records, { delimiter });
+  return serializeCsv(parsed.records, { delimiter, headers: hasHeader });
 }

@@ -3,6 +3,7 @@
  */
 
 import { InvalidInputError } from '../errors/index.js';
+import { safeSetProperty } from '../internal/escaping.js';
 
 export interface QuerystringToJsonOptions {
   /** How to handle repeated keys: 'array' (default), 'last', 'first' */
@@ -65,22 +66,22 @@ export function querystringToJson(
       else if (/^-?\d+(\.\d+)?$/.test(val)) val = Number(val);
     }
 
-    if (key in result) {
+    if (Object.prototype.hasOwnProperty.call(result, key)) {
       if (repeatedKeyStrategy === 'first') {
         // Keep existing
       } else if (repeatedKeyStrategy === 'last') {
-        result[key] = val;
+        safeSetProperty(result, key, val);
       } else {
         // 'array'
         const existing = result[key];
         if (Array.isArray(existing)) {
           existing.push(val);
         } else {
-          result[key] = [existing, val];
+          safeSetProperty(result, key, [existing, val]);
         }
       }
     } else {
-      result[key] = val;
+      safeSetProperty(result, key, val);
     }
   }
 
