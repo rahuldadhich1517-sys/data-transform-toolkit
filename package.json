@@ -1,5 +1,5 @@
 {
-  "name": "data-transform-toolkit",
+  "name": "@rahul_dadhich15/data-transform-toolkit",
   "type": "module",
   "version": "1.3.0",
   "description": "Production-grade TypeScript toolkit for JSON, CSV, Excel, YAML, XML, TOML, HTML, Markdown, SQL, and ENV conversion, parsing, validation, and diffing",
@@ -40,6 +40,17 @@
     "LICENSE",
     "CHANGELOG.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rahuldadhich1517-sys/date-time-kit"
+  },
+   "bugs": {
+    "url": "https://github.com/rahuldadhich1517-sys/date-time-kit/issues"
+  },
+  "homepage": "https://github.com/rahuldadhich1517-sys/date-time-ki#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "build": "tsc",
