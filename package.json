@@ -40,10 +40,14 @@
     "LICENSE",
     "CHANGELOG.md"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/rahuldadhich1517-sys/date-time-kit"
-  },
+ "repository": {
+  "type": "git",
+  "url": "https://github.com/rahuldadhich1517-sys/data-transform-toolkit.git"
+},
+"bugs": {
+  "url": "https://github.com/rahuldadhich1517-sys/data-transform-toolkit/issues"
+},
+"homepage": "https://github.com/rahuldadhich1517-sys/data-transform-toolkit#readme",
   "bugs": {
     "url": "https://github.com/rahuldadhich1517-sys/date-time-kit/issues"
   },
